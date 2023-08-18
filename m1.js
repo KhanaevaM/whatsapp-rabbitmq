@@ -36,5 +36,3 @@ app.post('/process', (req, res) => {
 app.listen(`3000`, () => {
   console.log(`Microservice M1 is running on http://${host}:3000`);
 });
-
-//setInterval(() => sendTaskToQueue({data: `some messgae`,}), 5000);
