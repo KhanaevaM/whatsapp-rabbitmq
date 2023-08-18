@@ -14,7 +14,7 @@ or
 
 ## With Docker
 
-1. Сlone Docker image
+1. Сlone repo
 
 ```
 git clone https://github.com/KhanaevaM/whatspp-rabbitmq
