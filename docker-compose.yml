@@ -1,0 +1,73 @@
+version: '3'
+networks:
+  app-tier:
+    driver: bridge
+services:
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbitmq
+    container_name: 'rabbitmq'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+    - app-tier
+
+  m1:
+    build:
+      context: .
+      dockerfile: Dockerfile.m1
+    container_name: 'm1'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    environment:
+      - RUNNING_IN_CONTAINER=true
+    networks:
+      - app-tier
+
+  m2:
+    build:
+      context: .
+      dockerfile: Dockerfile.m2
+    container_name: 'm2'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RUNNING_IN_CONTAINER=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+    - app-tier
+
+  sender:
+    build:
+      context: .
+      dockerfile: Dockerfile.sender
+    container_name: 'sender'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RUNNING_IN_CONTAINER=true
+    networks:
+    - app-tier
+
+
+
+
